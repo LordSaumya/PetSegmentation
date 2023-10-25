@@ -8,7 +8,6 @@ import seaborn as sns
 from tensorflow import keras
 import tensorflow as tf
 import tensorflow_datasets as tfds
-import cv2
 import PIL
 from IPython.display import clear_output
 
@@ -176,10 +175,12 @@ def segmentation_model():
 opt = keras.optimizers.Adam()
  
 model = segmentation_model()
+
+loss_fns = [tf.keras.losses.SparseCategoricalCrossentropy(from_logits=True), tf.keras.losses.DiceLoss(from_logits=True), tf.keras.losses.BinaryCrossentropy(from_logits=True)]
+
 model.compile(optimizer=opt,
-              loss=tf.keras.losses.SparseCategoricalCrossentropy(
-                  from_logits=True),
-              metrics=['accuracy'])
+              loss=loss_fns[0],
+              metrics=['recall', 'precision', 'accuracy'])
 
 def create_mask(pred_mask):
     pred_mask = tf.argmax(pred_mask, axis=-1)
